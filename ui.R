@@ -1,4 +1,5 @@
 library(shiny)
+library(plotly)
 
 ui <- fluidPage(
   titlePanel("Airline Ticket Price Trends"),
