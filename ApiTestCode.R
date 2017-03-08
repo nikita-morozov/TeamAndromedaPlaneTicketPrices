@@ -13,6 +13,7 @@ library("data.table")
 library("raster")
 library("grid")
 library("sp")
+library("ggmap")
 
 #Variables:
 country = "US"
@@ -82,13 +83,20 @@ worldHeatMapDataSpatialGrid <- sgdf_transform(worldForHeatmap)
 #########PLOT###########
 ########################
 
-g <- ggplot(world, aes(long, lat)) + 
+ggplot(world, aes(long, lat)) + 
   geom_polygon(aes(group=group),fill="white",colour="black",size=0.1) +
   coord_equal() + 
   scale_x_continuous(expand=c(0,0)) + 
   scale_y_continuous(expand=c(0,0)) +
   labs(x='Longitude', y='Latitude') +
-  theme_bw()
+  theme_bw()+
+  geom_polygon(aes(x = long, y = lat, group = group, fill = factor(changeGDP))) +
+  scale_fill_brewer(palette = "RdYlGn")+
+  coord_quickmap()
+  
+  
+  
+  geom_point(data = worldForHeatmap, aes(x,y),colour="red",size=0.1)
   
 ####################
 #######  XML #######
