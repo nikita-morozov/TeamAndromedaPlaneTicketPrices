@@ -14,7 +14,7 @@ ui <- fluidPage(
     
     mainPanel(
       tabsetPanel(type = "tabs", 
-        tabPanel("Timeline and Trends", plotlyOutput("timeline"), textOutput("timeline.comment")),
+        tabPanel("Minimum Price Per Destination", plotlyOutput("world.map"), textOutput("timeline.comment")),
         tabPanel("Best Time to Buy", plotlyOutput("best.date.to.buy"), textOutput("summary.petal")),
         tabPanel("Should I buy now?", textOutput("buy.now"), tableOutput('table'))
       )  

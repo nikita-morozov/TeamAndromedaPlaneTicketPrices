@@ -1,4 +1,4 @@
-library(shiny)
+library("shiny")
 library("dplyr")
 library("jsonlite")
 library("knitr")
@@ -31,10 +31,46 @@ server <- function(input, output, session) {
   query <- fromJSON(content(response, "text"))
   
   places <- flatten(query$Places)
-  routes <- flatten(query$Routes)
+  #routes <- flatten(query$Routes)
   quotes <- flatten(query$Quotes)
   carriers <- flatten(query$Carriers)
   currencies <-flatten(query$Currencies)
+  
+  places.countries.only <- filter(places, Type == "Country") %>% dplyr::select(2,4)
+  places.stations.only <- filter(places, Type == "Station") %>% dplyr::select(1,6,8) %>% 
+    left_join(quotes, by = c("PlaceId" = "OutboundLeg.DestinationId"))
+  places.min.price <- summarise(group_by(places.stations.only, PlaceId),m = min(MinPrice))
+  places.stations.only <- places.stations.only %>%  dplyr::select(1:3,5) %>% unique() %>% 
+    left_join(places.min.price)
+  
+  world <- map_data('world') %>% filter(region!='Antarctica')
+  world <- mutate(world, code = iso.alpha(world$region, n=2)) %>%
+    left_join(places.countries.only, by = c("code" = "SkyscannerCode")) %>% 
+    unique()
+  
+  
+  worldForHeatmap <- inner_join(world, places.stations.only, by = c("Name" = "CountryName")) %>% dplyr::select(long,lat,m,group) %>%  na.omit()
+  colnames(worldForHeatmap) <- c("x","y","m","group")
+  
+  world.cloropleth.map <- left_join(world, worldForHeatmap)
+  
+  ########################
+  #########PLOT###########
+  ########################
+  
+  output$world.map <- renderPlotly({
+    breaks = c(0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 10000)
+    world.map <- ggplot(data = world.cloropleth.map) + 
+      geom_polygon(aes(x = long, y = lat, group=group, fill = cut(m, breaks))) +
+      coord_quickmap() + 
+      #scale_x_continuous(expand=c(0,0)) + 
+      #scale_y_continuous(expand=c(0,0)) +
+      labs(x='Longitude', y='Latitude', title = "Prices Based on Destination") #+
+      #theme_bw()
+    #Allows the plot to be interactive with mouseover
+    ggplotly(world.map)
+  })
+  
 }
 
 shinyServer(server)

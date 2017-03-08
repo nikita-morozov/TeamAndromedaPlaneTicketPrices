@@ -13,6 +13,9 @@ library("data.table")
 library("raster")
 library("grid")
 library("sp")
+library("ggmap")
+library("get_map")
+library("leaflet")
 
 #Variables:
 country = "US"
@@ -57,6 +60,8 @@ world <- mutate(world, code = iso.alpha(world$region, n=2)) %>%
 worldForHeatmap <- inner_join(world, places.stations.only, by = c("Name" = "CountryName")) %>% dplyr::select(long,lat,m,group) %>%  na.omit()
 colnames(worldForHeatmap) <- c("x","y","m","group")
 
+world.cloropleth.map <- left_join(world, worldForHeatmap)
+
 #######################
 ########FORMAT#########
 #######################
@@ -81,14 +86,43 @@ worldHeatMapDataSpatialGrid <- sgdf_transform(worldForHeatmap)
 ########################
 #########PLOT###########
 ########################
+breaks = c(0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 10000)
+ggplot(data = world.cloropleth.map) + 
+  geom_polygon(aes(x = long, y = lat, group=group, fill = cut(m, breaks))) +
+  coord_quickmap() + 
+  #scale_x_continuous(expand=c(0,0)) + 
+  #scale_y_continuous(expand=c(0,0)) +
+  labs(x='Longitude', y='Latitude', title = "Prices Based on Destination") #+
+  #theme_bw()
 
-g <- ggplot(world, aes(long, lat)) + 
-  geom_polygon(aes(group=group),fill="white",colour="black",size=0.1) +
-  coord_equal() + 
-  scale_x_continuous(expand=c(0,0)) + 
-  scale_y_continuous(expand=c(0,0)) +
-  labs(x='Longitude', y='Latitude') +
-  theme_bw()
+########################
+####PLOT WITH GGMAPS####
+########################
+ggmap.world <- inner_join(places.stations.only, world.cloropleth.map)
+
+
+breaks = c(0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 10000)
+ggmap(data = world.cloropleth.map) + 
+  geom_polygon(aes(x = long, y = lat, group=group, fill = cut(m, breaks))) +
+  coord_quickmap() + 
+  #scale_x_continuous(expand=c(0,0)) + 
+  #scale_y_continuous(expand=c(0,0)) +
+  labs(x='Longitude', y='Latitude', title = "Prices Based on Destination") #+
+#theme_bw()
+
+########################
+####PLOT WIH LEAFLET####
+########################
+breaks = c(0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 10000)
+world.map.leaflet <- leaflet(world.cloropleth.map) %>% 
+  addPolygons(aes(x = long, y = lat, group=group, fill = cut(m, breaks))) +
+  coord_quickmap() + 
+  #scale_x_continuous(expand=c(0,0)) + 
+  #scale_y_continuous(expand=c(0,0)) +
+  labs(x='Longitude', y='Latitude', title = "Prices Based on Destination") #+
+#theme_bw()
+
+
   
 ####################
 #######  XML #######
