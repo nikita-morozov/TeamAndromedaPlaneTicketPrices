@@ -68,12 +68,12 @@ server <- function(input, output, session) {
       on.exit(progress$close())
       
       ggplot(data = world) + 
-       geom_polygon(aes(long,lat,group=group),fill="white",colour="black",size=0.1) +
+       geom_polygon(aes(long,lat,group=group),fill="#dadee5",colour="black",size=0.05) +
        coord_equal() + 
        scale_x_continuous(expand=c(0,0)) + 
        scale_y_continuous(expand=c(0,0)) +
        labs(x='Longitude', y='Latitude') +
-       theme_bw()+
+       theme(panel.background = element_rect(fill = "#dbecff"))+
        geom_polygon(data = worldForHeatmap, aes(x = x, y = y, group=group, fill = cut(m, breaks))) +
        scale_fill_brewer(palette = "RdYlGn", direction = -1) +
        coord_quickmap() + 
