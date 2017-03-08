@@ -1,11 +1,12 @@
 library(shiny)
+install.packages("timevis")
+library(timevis)
 
 ui <- fluidPage(
   titlePanel("Airline Ticket Price Trends"),
 
   sidebarLayout(
     sidebarPanel(
-      #Sys.date()
       sliderInput('sample.number', label = "How many samples?",
                   min = 10, max = 50, value = 50),
       dateInput("depart.data", label = "Departure Date", value = NULL, min = NULL, startview = "month", weekstart = 0),
