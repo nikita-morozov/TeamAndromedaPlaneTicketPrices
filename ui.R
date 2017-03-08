@@ -1,6 +1,5 @@
 library(shiny)
-install.packages("timevis")
-library(timevis)
+library(plotly)
 
 ui <- fluidPage(
   titlePanel("Airline Ticket Price Trends"),
