@@ -10,8 +10,20 @@ library("scales")
 options(shiny.maxRequestSize=980*1024^2)
 options(scipen = 15000)
 
+memoryVector <- c("country","dept","dest")
+
 server <- function(input, output, session) {
+   
       
+      
+      getMemory <- function(){
+         return(memoryVector)
+      }
+      
+      setMemory <- function(store){
+         memoryVector <- store
+      }
+   
       observe({
          
          countriesList <- read.csv("./data/geo.csv", stringsAsFactors = FALSE)
@@ -40,13 +52,18 @@ server <- function(input, output, session) {
          places.stations.only <- filter(places, Type == "Station")
          from <- places.stations.only %>% filter(CountryName == input$select.country)
          to <- places.stations.only %>% filter(CountryName == input$select.dest)
-
          
-         if (input$select.dest != "Anywhere"){
-            #x <- character(0)
+         if (input$select.dest != "Anywhere" && isTRUE(getMemory()[1] != input$select.dest)){
             
-            updateSelectInput(session, "depId", label = "Select Departure Airport:", choices = from$Name, selected = from$Name[1])
-            updateSelectInput(session, "destId", label = "Select Destination Airport:", choices = to$Name, selected = from$Name[1])
+            if(isTRUE(getMemory()[1] != input$select.dest && isTRUE(getMemory()[2:3] == c(input$depId,input$destId)))){
+               updateSelectInput(session, "depId", label = "Select Departure Airport:", choices = from$Name, selected = from$Name[1])
+               updateSelectInput(session, "destId", label = "Select Destination Airport:", choices = to$Name, selected = to$Name[1])
+            }
+            
+            if(isTRUE(getMemory()[2:3] != c(input$depId,input$destId)) || input$depId == "None"){
+               updateSelectInput(session, "depId", label = "Select Departure Airport:", choices = from$Name, selected = from$Name[1])
+               updateSelectInput(session, "destId", label = "Select Destination Airport:", choices = to$Name, selected = to$Name[1])
+            }
             
             airportdep <- from %>% filter(Name == input$depId) %>% select(SkyscannerCode)
             airportdest <- to %>% filter(Name == input$destId) %>% select(SkyscannerCode)
@@ -88,14 +105,12 @@ server <- function(input, output, session) {
                   "Quotes is Missing"
                })
             } 
-            
          } else{
-            x <- character(0)
+            #x <- character(0)
             updateSelectInput(session, "depId", label = "Warning: Please Select Destination Country", choices =  c("None"), selected = "None")
             updateSelectInput(session, "destId", label = "Warning: Please Select Destination Country", choices =  c("None"), selected = "None")
-            updateSelectInput(session, "routeId", label = "Warning: Please Select Destination Country", choices =  c("None"), selected = "None")
          }
-         
+         setMemory(c(input$select.dest, input$depId, input$destId))
       })
    
    
