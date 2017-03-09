@@ -247,6 +247,15 @@ server <- function(input, output, session) {
       
       g
   })
+   
+   output$top.min.price.summary <- renderText({
+     table.summary <- ("The above table shows the top five cheapest countries you can fly to given the country of origin and
+                       and the departure date that you selected. Within the table, you can also see the minimum price to fly
+                       there at this current time. Remember that the data is live so it might change if you look back later.
+                       This table can be useful for you as the user if you want to have a get away outside the country but
+                       you want to fly for cheap. ")
+     return(table.summary)
+   })  
   
 }
 

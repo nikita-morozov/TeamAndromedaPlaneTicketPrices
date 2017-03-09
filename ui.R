@@ -21,7 +21,7 @@ ui <- fluidPage(
     mainPanel(
       tabsetPanel(type = "tabs", 
         tabPanel("World Map", plotOutput("world.map",width = "100%",height = "400px"), textOutput("timeline.comment")),
-        tabPanel("Where Should I Go?", dataTableOutput('table')),
+        tabPanel("Where Should I Go?", dataTableOutput('table'), textOutput("top.min.price.summary")),
         tabPanel("Route Ticket Price Fluctuation",textOutput("message"))
       )  
     )
