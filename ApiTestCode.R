@@ -13,14 +13,13 @@ library("data.table")
 library("raster")
 library("grid")
 library("sp")
-
 #Variables:
 country = "US"
 currency = "USD"
 locale = "en-us"
-originplace="SEA"
-destinationplace="YLW"
-outbounddate="2017-04-01"
+originplace="BOS"
+destinationplace="YAM"
+outbounddate="2017-03-20"
 #inbounddate="2017-12"
 apikey="te892026803091243844897141219716"
 
