@@ -14,14 +14,18 @@ server <- function(input, output, session) {
    
    output$world.map <- renderPlot({
       
+      countriesList <- read.csv("./data/geo.csv", stringsAsFactors = FALSE)
+      
       progress <- shiny::Progress$new()
       progress$set(message = "Computing Data", value = 0)
+      
+      translatedoriginplace <- filter(countriesList, Name == input$select.country) %>% select(ID)
       
       #Variables:
       country = "US"
       currency = "USD"
       locale = "en-us"
-      originplace="US"
+      originplace=translatedoriginplace[1,1]
       destinationplace="Anywhere"
       outbounddate = input$depart.data
       #inbounddate="2017-12"
@@ -57,6 +61,10 @@ server <- function(input, output, session) {
         left_join(places.countries.only, by = c("code" = "SkyscannerCode")) %>% 
         unique()
       
+      currentCountry <- filter(world, code == translatedoriginplace[1,1])
+      
+      world <- filter(world, code != translatedoriginplace[1,1])
+      
       worldForHeatmap <- inner_join(world, places.stations.only, by = c("Name" = "CountryName")) %>% dplyr::select(long,lat,m,group)%>%  na.omit()
       colnames(worldForHeatmap) <- c("x","y","m","group")
       
@@ -69,6 +77,7 @@ server <- function(input, output, session) {
       
       ggplot(data = world) + 
        geom_polygon(aes(long,lat,group=group),fill="#dadee5",colour="black",size=0.05) +
+       geom_polygon(data = currentCountry, aes(long,lat,group=group),fill="#d04efc",colour="#fca6f9",size=0.1) +
        coord_equal() + 
        scale_x_continuous(expand=c(0,0)) + 
        scale_y_continuous(expand=c(0,0)) +

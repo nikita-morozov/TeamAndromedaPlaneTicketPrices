@@ -13,9 +13,6 @@ library("data.table")
 library("raster")
 library("grid")
 library("sp")
-library("ggmap")
-library("get_map")
-library("leaflet")
 
 #Variables:
 country = "US"
@@ -30,6 +27,12 @@ apikey="te892026803091243844897141219716"
 ####################
 ####### JSON #######
 ####################
+require(jsonlite)
+
+countriesList <- GET("http://partners.api.skyscanner.net/apiservices/geo/v1.0?apiKey=te892026803091243844897141219716")
+countriesList <- fromJSON(content(countriesList, "text"))
+
+countriesListdf <- flatten(countriesList)
 
 routes.url <- paste0("http://partners.api.skyscanner.net/apiservices/browsequotes/v1.0/",country,"/",currency,"/",locale,"/",originplace,"/",destinationplace,"/", outbounddate,"?apiKey=", apikey)
 
