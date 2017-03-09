@@ -12,51 +12,54 @@ options(scipen = 15000)
 
 server <- function(input, output, session) {
       
-   output$table <- renderTable({
-      countriesList <- read.csv("./data/geo.csv", stringsAsFactors = FALSE)
-      
-      progress <- shiny::Progress$new()
-      progress$set(message = "Computing Data", value = 0)
-      
-      translatedoriginplace <- filter(countriesList, Name == input$select.country) %>% select(ID)
-      
-      #Variables:
-      country = "US"
-      currency = "USD"
-      locale = "en-us"
-      originplace=translatedoriginplace[1,1]
-      destinationplace="Anywhere"
-      outbounddate = input$depart.data
-      #inbounddate="2017-12"
-      apikey="te892026803091243844897141219716"
-      
-      progress$set(message = "Routing API", value = 1)
-      
-      routes.url <- paste0("http://partners.api.skyscanner.net/apiservices/browsequotes/v1.0/",country,"/",currency,"/",locale,"/",originplace,"/",destinationplace,"/", outbounddate,"?apiKey=", apikey)
-      
-      response <- GET(routes.url)
-      query <- fromJSON(content(response, "text"))
-      
-      places <- flatten(query$Places)
-      quotes <- flatten(query$Quotes) #%>% dplyr::select(2,7,8)
-      carriers <- flatten(query$Carriers)
-      #currencies <-flatten(query$Currencies)
-      
-      places.countries.only <- filter(places, Type == "Country") %>% dplyr::select(2,4)
-      places.stations.only <- filter(places, Type == "Station") %>% dplyr::select(1,6,8) %>% 
-         left_join(quotes, by = c("PlaceId" = "OutboundLeg.DestinationId"))
-      places.min.price <- summarise(group_by(places.stations.only, PlaceId),m = min(MinPrice))
-      places.stations.only <- places.stations.only %>%  dplyr::select(1:3,5,6,8) %>% 
-         unique() %>% left_join(places.min.price)
-      
-      places.stations.only <- arrange(places.stations.only, m) %>% filter(CountryName != input$select.country)  %>% 
-         top_n(-5) %>% select(2:5)
-      
-      progress$set(message = "Constructing Table", value = 4)
-      on.exit(progress$close())
-      
-      places.stations.only
-   })
+      getTable <- function(input,output){
+         countriesList <- read.csv("./data/geo.csv", stringsAsFactors = FALSE)
+         
+         progress <- shiny::Progress$new()
+         progress$set(message = "Computing Data", value = 0)
+         
+         translatedoriginplace <- filter(countriesList, Name == input$select.country) %>% select(ID)
+         
+         #Variables:
+         country = "US"
+         currency = "USD"
+         locale = "en-us"
+         originplace=translatedoriginplace[1,1]
+         destinationplace="Anywhere"
+         outbounddate = input$depart.data
+         #inbounddate="2017-12"
+         apikey="te892026803091243844897141219716"
+         
+         progress$set(message = "Routing API", value = 1)
+         
+         routes.url <- paste0("http://partners.api.skyscanner.net/apiservices/browsequotes/v1.0/",country,"/",currency,"/",locale,"/",originplace,"/",destinationplace,"/", outbounddate,"?apiKey=", apikey)
+         
+         response <- GET(routes.url)
+         query <- fromJSON(content(response, "text"))
+         
+         places <- flatten(query$Places)
+         quotes <- flatten(query$Quotes) #%>% dplyr::select(2,7,8)
+         carriers <- flatten(query$Carriers)
+         #currencies <-flatten(query$Currencies)
+         
+         places.countries.only <- filter(places, Type == "Country") %>% dplyr::select(2,4)
+         places.stations.only <- filter(places, Type == "Station") %>% dplyr::select(1,6,8) %>% 
+            left_join(quotes, by = c("PlaceId" = "OutboundLeg.DestinationId"))
+         places.min.price <- summarise(group_by(places.stations.only, PlaceId),m = min(MinPrice))
+         places.stations.only <- places.stations.only %>%  dplyr::select(1:3,5,6,8) %>% 
+            unique() %>% left_join(places.min.price)
+         
+         places.stations.only <- arrange(places.stations.only, m) %>% filter(CountryName != input$select.country)  %>% select(2:5)
+         
+         colnames(places.stations.only) <- c("City Name","Country Name","Price ($ Dollars)","Direct Flight")
+         
+         progress$set(message = "Constructing Table", value = 4)
+         on.exit(progress$close())
+         
+         return(places.stations.only)
+      }   
+   
+   output$table <- renderDataTable({getTable(input,output)})
    
    output$world.map <- renderPlot({
       
