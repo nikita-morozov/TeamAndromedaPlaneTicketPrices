@@ -18,8 +18,8 @@ library("sp")
 country = "US"
 currency = "USD"
 locale = "en-us"
-originplace="US"
-destinationplace="Anywhere"
+originplace="SEA"
+destinationplace="YLW"
 outbounddate="2017-04-01"
 #inbounddate="2017-12"
 apikey="te892026803091243844897141219716"
@@ -47,11 +47,12 @@ carriers <- flatten(query$Carriers)
 #currencies <-flatten(query$Currencies)
 
 places.countries.only <- filter(places, Type == "Country") %>% dplyr::select(2,4)
-places.stations.only <- filter(places, Type == "Station") %>% dplyr::select(1,6,8) %>% 
-  left_join(quotes, by = c("PlaceId" = "OutboundLeg.DestinationId"))
-places.min.price <- summarise(group_by(places.stations.only, PlaceId),m = min(MinPrice))
+places.stations.only <- filter(places, Type == "Station") #dplyr::select(1,6,8) %>% 
+from <- places.stations.only %>% filter(CountryName = )
+
+   places.min.price <- summarise(group_by(places.stations.only, PlaceId),m = min(MinPrice))
 places.stations.only <- places.stations.only %>%  dplyr::select(1:3,5,6,8) %>% 
-   unique() %>% left_join(places.min.price)
+   unique() %>% left_join(places.min.price) %>% na.omit()
 
 places.stations.only <- arrange(places.stations.only, m) %>% filter(CountryName != "United States")  %>% 
    top_n(-5) # %>% 
