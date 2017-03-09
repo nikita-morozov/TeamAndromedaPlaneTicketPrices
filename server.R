@@ -5,10 +5,10 @@ library("knitr")
 library("httr")
 library("ggplot2")
 library("XML")
+library("scales")
 
 options(shiny.maxRequestSize=980*1024^2)
-
-
+options(scipen = 15000)
 
 server <- function(input, output, session) {
    
@@ -84,9 +84,9 @@ server <- function(input, output, session) {
        labs(x='Longitude', y='Latitude') +
        theme(panel.background = element_rect(fill = "#dbecff"))+
        geom_polygon(data = worldForHeatmap, aes(x = x, y = y, group=group, fill = cut(m, breaks))) +
-       scale_fill_brewer(palette = "RdYlGn", direction = -1) +
+       scale_fill_brewer(palette = "RdYlGn", direction = -1, name = "Minimum Price ($)", labels = c("0-100","100-200", "200-300","300-400","400-500","500-600","600-700","700-800","800-900","900-1000","1000+")) +
        coord_quickmap() + 
-       labs(x='Longitude', y='Latitude', title = "Prices Based on Destination")
+       labs(x='Longitude', y='Latitude', title = "Prices Based on Destination") 
       
       #Allows the plot to be interactive with mouseover
       #ggplotly(world.map)
