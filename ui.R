@@ -55,38 +55,38 @@ print.worldmap <- print(paste0("Our World Map creates a visual and a dynamic map
                                by higlhiting the country in purple to give a more fluid user experience."))
 
 ui <- fluidPage(
-  titlePanel("Airline Ticket Price Trends"),
-
-  # Include a `sidebarLayout()`
-  sidebarLayout(
-    sidebarPanel(
-      dateInput("depart.data", label = "Departure Date", value = "2017-03-20",max = "2018-03-08", min = "2017-03-15", startview = "month", weekstart = 0),
-      selectInput('select.country', "Select Departure Country", choices = countriesList$Name, selected = 'United States'),
-      selectInput('select.dest', "Select Destination Country", choices = countriesList %>% rbind(c("Anywhere","Anywhere")) %>% select(Name), selected = 'Anywhere'),
-      selectInput("depId", label = "Warning: Please Select Destination Country", choices =  c("None"), selected = "None"), 
-      selectInput("destId", label = "Warning: Please Select Destination Country", choices =  c("None"), selected = "None"),
-      submitButton("Update View", icon("refresh"))
+   titlePanel("Airline Ticket Price Trends"),
+   
+   # Include a `sidebarLayout()`
+   sidebarLayout(
+      sidebarPanel(
+         dateInput("depart.data", label = "Departure Date", value = "2017-03-20",max = "2018-03-08", min = "2017-03-15", startview = "month", weekstart = 0),
+         selectInput('select.country', "Select Departure Country", choices = countriesList$Name, selected = 'United States'),
+         selectInput('select.dest', "Select Destination Country", choices = countriesList %>% rbind(c("Anywhere","Anywhere")) %>% select(Name), selected = 'Anywhere'),
+         selectInput("depId", label = "Warning: Please Select Destination Country", choices =  c("None"), selected = "None"), 
+         selectInput("destId", label = "Warning: Please Select Destination Country", choices =  c("None"), selected = "None"),
+         submitButton("Update View", icon("refresh"))
       ),
-    
-    # Creates the main panel containing output elements such as setting the tabs for the program.
-    # About Us explains the Mission Statement for the project
-    # WorldMap contains the explanation and the extended legends with specified colors
-    mainPanel(
-       tabsetPanel(type = "tabs", 
-                   tabPanel("About Us", titlePanel("Team Andromeda"), br(), h3("Introduction"),
-                            p(print.introduction), br(), h3("Target Audience"), print.target.audiance, br(), br(), h3("Data Set"), print.dataset, br(), br(), h3("Team Members"),
-                            img(src="nikita.jpg", height = 300, width = 300), h4("Nikita Morozov"), br(),
-                            img(src="monica.jpg", height = 200, width = 350), h4("Monica Riley"), br(), img(src="mano.jpg", height = 200, width = 350), h4("Mano Barkovics")),
-                   tabPanel("World Map", plotOutput("world.map",width = "100%",height = "400px"),
-                            textOutput("timeline.comment"), h5("Legend"), h5(span("Light Blue", style = "color:#dbecff "), " = Oceans"),
-                            h5(span("Purple", style = "color:#d04efc"), " = Current Location"),
-                            h5(span("Gray", style = "color:#dadee5"), " = No information available"),
-                            titlePanel("Visual Experience"), print.worldmap, br(), br()),
-                   tabPanel("Where Should I Go?", dataTableOutput('table'), textOutput("top.min.price.summary")),
-                   tabPanel("Route Ticket Price Fluctuation",textOutput("message"), plotOutput('route.chart'))
-       ) 
-    )
-  )
+      
+      # Creates the main panel containing output elements such as setting the tabs for the program.
+      # About Us explains the Mission Statement for the project
+      # WorldMap contains the explanation and the extended legends with specified colors
+      mainPanel(
+         tabsetPanel(type = "tabs", 
+                     tabPanel("About Us", titlePanel("Team Andromeda"), br(), h3("Introduction"),
+                              p(print.introduction), br(), h3("Target Audience"), print.target.audiance, br(), br(), h3("Data Set"), print.dataset, br(), br(), h3("Team Members"),
+                              img(src="nikita.jpg", height = 300, width = 300), h4("Nikita Morozov"), br(),
+                              img(src="monica.jpg", height = 200, width = 350), h4("Monica Riley"), br(), img(src="mano.jpg", height = 200, width = 350), h4("Mano Barkovics")),
+                     tabPanel("World Map", plotOutput("world.map",width = "100%",height = "400px"),
+                              textOutput("timeline.comment"), h5("Legend"), h5(span("Light Blue", style = "color:#dbecff "), " = Oceans"),
+                              h5(span("Purple", style = "color:#d04efc"), " = Current Location"),
+                              h5(span("Gray", style = "color:#dadee5"), " = No information available"),
+                              titlePanel("Visual Experience"), print.worldmap, br(), br()),
+                     tabPanel("Where Should I Go?", dataTableOutput('table'), textOutput("top.min.price.summary")),
+                     tabPanel("Route Ticket Price Fluctuation",textOutput("message"), plotOutput('route.chart'))
+         ) 
+      )
+   )
 )
 
 # call `shinyUI()` to create the UI out of your `ui` value
