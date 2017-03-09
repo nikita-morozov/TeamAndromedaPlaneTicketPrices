@@ -41,16 +41,23 @@ query <- fromJSON(content(response, "text"))
 
 places <- flatten(query$Places)
 #routes <- flatten(query$Routes)
-quotes <- flatten(query$Quotes) %>% dplyr::select(2,7,8)
-#carriers <- flatten(query$Carriers)
+quotes <- flatten(query$Quotes) #%>% dplyr::select(2,7,8)
+
+carriers <- flatten(query$Carriers)
 #currencies <-flatten(query$Currencies)
 
 places.countries.only <- filter(places, Type == "Country") %>% dplyr::select(2,4)
 places.stations.only <- filter(places, Type == "Station") %>% dplyr::select(1,6,8) %>% 
   left_join(quotes, by = c("PlaceId" = "OutboundLeg.DestinationId"))
 places.min.price <- summarise(group_by(places.stations.only, PlaceId),m = min(MinPrice))
-places.stations.only <- places.stations.only %>%  dplyr::select(1,3) %>% unique() %>% 
-  left_join(places.min.price)
+places.stations.only <- places.stations.only %>%  dplyr::select(1:3,5,6,8) %>% 
+   unique() %>% left_join(places.min.price)
+
+places.stations.only <- arrange(places.stations.only, m) %>% filter(CountryName != "United States")  %>% 
+   top_n(-5) # %>% 
+
+places.stations.only <- left_join(places.stations.only ,carriers, by = c("OutboundLeg.CarrierIds" = "CarrierId"))
+
 
 world <- map_data('world') %>% filter(region!='Antarctica')
 

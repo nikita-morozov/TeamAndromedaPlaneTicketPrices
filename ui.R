@@ -19,8 +19,8 @@ ui <- fluidPage(
     mainPanel(
       tabsetPanel(type = "tabs", 
         tabPanel("Cheap Travel Destinations", plotOutput("world.map",width = "100%",height = "400px"), textOutput("timeline.comment")),
-        tabPanel("Tab2", plotlyOutput("best.date.to.buy"), textOutput("summary.petal")),
-        tabPanel("Tab3", textOutput("buy.now"), tableOutput('table'))
+        tabPanel("Where Should I Go?", tableOutput('table')),
+        tabPanel("Tab3", textOutput("buy.now"))
       )  
     )
   )
